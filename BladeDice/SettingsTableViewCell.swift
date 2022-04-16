@@ -21,8 +21,8 @@ final class SettingsTableViewCell: UITableViewCell {
     
     struct ViewModel {
         let trickAttribute: Trick.TrickAttribute
-        let isOn: Bool
         let isEnabled: Bool
+        let canToggleEnabledState: Bool
         var title: String {
             trickAttribute.name
         }
@@ -160,8 +160,8 @@ final class SettingsTableViewCell: UITableViewCell {
         }
 
         label.text = viewModel.title
-        toggleSwitch.setOn(viewModel.isOn, animated: false)
-        toggleSwitch.isEnabled = viewModel.isEnabled
+        toggleSwitch.setOn(viewModel.isEnabled, animated: false)
+        toggleSwitch.isEnabled = viewModel.canToggleEnabledState
     }
     
     // MARK: - Action

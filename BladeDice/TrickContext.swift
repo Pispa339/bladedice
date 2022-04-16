@@ -76,11 +76,7 @@ class TrickContext {
     var isHBlockTricksEnabled: Bool {
         trickAttributesByEnabledState[.trickType(trickType: .hBlock)] ?? true
     }
-    
-    func isTrickTypeEnabled(_ trickType: Trick.TrickType) -> Bool {
-        trickAttributesByEnabledState[.trickType(trickType: trickType)] ?? true
-    }
-    
+        
     var enabledTrickTypes: [Trick.TrickType] {
         trickAttributesByEnabledState.compactMap { (trickAttribute, isEnabled) in
             guard case let .trickType(trickType) = trickAttribute, isEnabled else {
@@ -116,6 +112,24 @@ class TrickContext {
             return spin
         }
     }
+
+    // MARK: - Methods
+    
+    func enabledTrickSpinsWithTrickType(_ trickType: Trick.TrickType) -> [Trick.Spin] {
+        enabledTrickSpins.filter({ $0.trickType == trickType })
+    }
+    
+    func enabledTrickSidesWithTrickType(_ trickType: Trick.TrickType) -> [Trick.Side] {
+        enabledTrickSides.filter({ $0.trickType == trickType })
+    }
+    
+    func enabledTrickBasesWithTrickType(_ trickType: Trick.TrickType) -> [Trick.TrickBase] {
+        enabledTrickBases.filter({ $0.trickType == trickType })
+    }
+        
+    func isTrickTypeEnabled(_ trickType: Trick.TrickType) -> Bool {
+        trickAttributesByEnabledState[.trickType(trickType: trickType)] ?? true
+    }
     
     func enabledTrickAttributes(withType: Trick.TrickAttribute.TrickAttributeType) -> [Trick.TrickAttribute] {
         trickAttributesByEnabledState.compactMap { (trickAttribute, isEnabled) in
@@ -127,39 +141,12 @@ class TrickContext {
         }
     }
     
-    var enabledSoulPlateTrickSpins: [Trick.Spin] {
-        enabledTrickSpins.filter({ $0.isSoulPlateTrick })
-    }
-    
-    var enabledSoulPlateSides: [Trick.Side] {
-        enabledTrickSides.filter({ $0.isSoulPlateTrick })
-    }
-    
-    var enabledSoulPlateBases: [Trick.TrickBase] {
-        enabledTrickBases.filter({ $0.isSoulPlateTrick })
-    }
-    
-    var enabledHBlockTrickSpins: [Trick.Spin] {
-        enabledTrickSpins.filter({ !$0.isSoulPlateTrick })
-    }
-    
-    var enabledHBlockSides: [Trick.Side] {
-        enabledTrickSides.filter({ !$0.isSoulPlateTrick })
-    }
-    
-    var enabledHBlockBases: [Trick.TrickBase] {
-        enabledTrickBases.filter({ !$0.isSoulPlateTrick })
-    }
-    
-    // MARK: - Methods
-    
     func canDisableTrickAttribute(_ trickAttribute: Trick.TrickAttribute) -> Bool {
         guard trickAttribute.type != .trickType else {
             return true
         }
         
-        let enabledAttributesWithMatchingType = enabledTrickAttributes(withType: trickAttribute.type)
-            .filter { $0.isSoulPlateAttribute == trickAttribute.isSoulPlateAttribute }
+        let enabledAttributesWithMatchingType = enabledTrickAttributes(withType: trickAttribute.type).filter { $0.trickType == trickAttribute.trickType }
         return enabledAttributesWithMatchingType.count > 1
     }
         
@@ -191,9 +178,7 @@ class TrickContext {
                     trickAttributesByEnabledState[.trickType(trickType: .hBlock)] = isSoulPlateTrickType ? isAttributeEnabled : isEnabled
                 }
             case .trickBase, .side, .spin:
-                let isSoulPlateTypesEnabled = isSoulPlateTrickType ? isEnabled : isAttributeEnabled
-                let isHBlockTypesEnabled = !isSoulPlateTrickType ? isEnabled : isAttributeEnabled
-                trickAttributesByEnabledState[trickAttribute] = trickAttribute.isSoulPlateAttribute ? isSoulPlateTypesEnabled : isHBlockTypesEnabled
+                trickAttributesByEnabledState[trickAttribute] = trickType == trickAttribute.trickType ? isEnabled : isAttributeEnabled
             }
         }
     }

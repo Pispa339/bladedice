@@ -65,19 +65,19 @@ struct Trick {
             }
         }
         
-        var isSoulPlateAttribute: Bool {
+        var trickType: TrickType {
             switch self {
             case .trickType(let trickType):
-                return trickType == .soulPlate
+                return trickType
             case .trickBase(let trickBase):
-                return trickBase.isSoulPlateTrick
+                return trickBase.trickType
             case .side(let side):
-                return side.isSoulPlateTrick
+                return side.trickType
             case .spin(let spin):
-                return spin.isSoulPlateTrick
+                return spin.trickType
             }
         }
-        
+
     }
     
     enum TrickType: String, CaseIterable {
@@ -97,12 +97,12 @@ struct Trick {
         case backslide
         case torque
         
-        var isSoulPlateTrick: Bool {
+        var trickType: Trick.TrickType {
             switch self {
             case .soul, .acid, .mizou, .pornstar:
-                return true
+                return .soulPlate
             case .royale, .nugen, .unity, .backslide, .torque:
-                return false
+                return .hBlock
             }
         }
     }
@@ -114,12 +114,12 @@ struct Trick {
         case frontside
         case backside
         
-        var isSoulPlateTrick: Bool {
+        var trickType: Trick.TrickType {
             switch self {
             case .soulside, .topside:
-                return true
+                return .soulPlate
             case .frontside, .backside:
-                return false
+                return .hBlock
             }
         }
     }
@@ -137,12 +137,12 @@ struct Trick {
         case twoSeventy = "270"
         case fakieTwoSeventy = "Fakie 270"
         
-        var isSoulPlateTrick: Bool {
+        var trickType: Trick.TrickType {
             switch self {
             case .alleyOop, .truespin, .inspin, .outspin, .threeSixty, .hurricane, .fullcab, .fullTrue:
-                return true
+                return .soulPlate
             case .twoSeventy, .fakieTwoSeventy:
-                return false
+                return .hBlock
             }
         }
     }

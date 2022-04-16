@@ -24,22 +24,10 @@ struct TrickGenerator {
         guard let trickType = trickContext.enabledTrickTypes.randomElement() else {
             return nil
         }
-        
-        let isSoulPlateTrick = trickType == .soulPlate
-        
-        let spin: Trick.Spin?
-        let side: Trick.Side?
-        let base: Trick.TrickBase?
-        
-        if isSoulPlateTrick {
-            spin = trickContext.enabledSoulPlateTrickSpins.randomElement()
-            side = trickContext.enabledSoulPlateSides.randomElement()
-            base = trickContext.enabledSoulPlateBases.randomElement()
-        } else {
-            spin = trickContext.enabledHBlockTrickSpins.randomElement()
-            side = trickContext.enabledHBlockSides.randomElement()
-            base = trickContext.enabledHBlockBases.randomElement()
-        }
+
+        let spin: Trick.Spin? = trickContext.enabledTrickSpinsWithTrickType(trickType).randomElement()
+        let side: Trick.Side? = trickContext.enabledTrickSidesWithTrickType(trickType).randomElement()
+        let base: Trick.TrickBase? = trickContext.enabledTrickBasesWithTrickType(trickType).randomElement()
         
         guard let spin = spin, let side = side, let base = base else {
             return nil

@@ -39,9 +39,17 @@ final class SettingsViewController: UIViewController {
                     return SettingsTableViewCell()
                 }
                 
-                let isOn = (self.trickContext.trickAttributesByEnabledState[trickAttribute] ?? true)
-                let isEnabled = self.trickContext.canDisableTrickAttribute(trickAttribute) || !isOn
-                let cellViewModel = SettingsTableViewCell.ViewModel(trickAttribute: trickAttribute, isOn: isOn, isEnabled: isEnabled)
+                let isEnabled = (self.trickContext.trickAttributesByEnabledState[trickAttribute] ?? true)
+                let isTrickTypeEnabled = self.trickContext.isTrickTypeEnabled(trickAttribute.trickType)
+                
+                let canToggleEnabledState: Bool
+                if isTrickTypeEnabled {
+                    canToggleEnabledState = (self.trickContext.canDisableTrickAttribute(trickAttribute) || !isEnabled)
+                } else {
+                    canToggleEnabledState = trickAttribute.type == .trickType
+                }
+                
+                let cellViewModel = SettingsTableViewCell.ViewModel(trickAttribute: trickAttribute, isEnabled: isEnabled, canToggleEnabledState: canToggleEnabledState)
                 cell.viewModel = cellViewModel
                 cell.delegate = self
 
