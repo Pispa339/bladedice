@@ -68,15 +68,7 @@ class TrickContext {
     // MARK: - Properties
     
     private(set) var trickAttributesByEnabledState: [Trick.TrickAttribute: Bool]
-    
-    var isSoulPlateTricksEnabled: Bool {
-        trickAttributesByEnabledState[.trickType(trickType: .soulPlate)] ?? true
-    }
-    
-    var isHBlockTricksEnabled: Bool {
-        trickAttributesByEnabledState[.trickType(trickType: .hBlock)] ?? true
-    }
-        
+            
     var enabledTrickTypes: [Trick.TrickType] {
         trickAttributesByEnabledState.compactMap { (trickAttribute, isEnabled) in
             guard case let .trickType(trickType) = trickAttribute, isEnabled else {
@@ -86,45 +78,33 @@ class TrickContext {
         }
     }
     
-    var enabledTrickBases: [Trick.TrickBase] {
+    // MARK: - Methods
+    
+    func enabledTrickSpinsWithTrickType(_ trickType: Trick.TrickType) -> [Trick.Spin] {
         trickAttributesByEnabledState.compactMap { (trickAttribute, isEnabled) in
-            guard case let .trickBase(trickBase) = trickAttribute, isEnabled else {
+            guard case let .spin(spin) = trickAttribute, isEnabled, spin.trickType == trickType else {
                 return nil
             }
-            return trickBase
+            return spin
         }
     }
     
-    var enabledTrickSides: [Trick.Side] {
+    func enabledTrickSidesWithTrickType(_ trickType: Trick.TrickType) -> [Trick.Side] {
         trickAttributesByEnabledState.compactMap { (trickAttribute, isEnabled) in
-            guard case let .side(side) = trickAttribute, isEnabled else {
+            guard case let .side(side) = trickAttribute, isEnabled, side.trickType == trickType else {
                 return nil
             }
             return side
         }
     }
     
-    var enabledTrickSpins: [Trick.Spin] {
+    func enabledTrickBasesWithTrickType(_ trickType: Trick.TrickType) -> [Trick.TrickBase] {
         trickAttributesByEnabledState.compactMap { (trickAttribute, isEnabled) in
-            guard case let .spin(spin) = trickAttribute, isEnabled else {
+            guard case let .trickBase(trickBase) = trickAttribute, isEnabled, trickBase.trickType == trickType else {
                 return nil
             }
-            return spin
+            return trickBase
         }
-    }
-
-    // MARK: - Methods
-    
-    func enabledTrickSpinsWithTrickType(_ trickType: Trick.TrickType) -> [Trick.Spin] {
-        enabledTrickSpins.filter({ $0.trickType == trickType })
-    }
-    
-    func enabledTrickSidesWithTrickType(_ trickType: Trick.TrickType) -> [Trick.Side] {
-        enabledTrickSides.filter({ $0.trickType == trickType })
-    }
-    
-    func enabledTrickBasesWithTrickType(_ trickType: Trick.TrickType) -> [Trick.TrickBase] {
-        enabledTrickBases.filter({ $0.trickType == trickType })
     }
         
     func isTrickTypeEnabled(_ trickType: Trick.TrickType) -> Bool {
