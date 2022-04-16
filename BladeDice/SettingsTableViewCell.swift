@@ -37,7 +37,7 @@ final class SettingsTableViewCell: UITableViewCell {
             updateView()
         }
     }
-    
+        
     private lazy var label: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false

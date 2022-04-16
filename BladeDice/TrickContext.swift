@@ -77,6 +77,10 @@ class TrickContext {
         trickAttributesByEnabledState[.trickType(trickType: .hBlock)] ?? true
     }
     
+    func isTrickTypeEnabled(_ trickType: Trick.TrickType) -> Bool {
+        trickAttributesByEnabledState[.trickType(trickType: trickType)] ?? true
+    }
+    
     var enabledTrickTypes: [Trick.TrickType] {
         trickAttributesByEnabledState.compactMap { (trickAttribute, isEnabled) in
             guard case let .trickType(trickType) = trickAttribute, isEnabled else {
@@ -113,6 +117,16 @@ class TrickContext {
         }
     }
     
+    func enabledTrickAttributes(withType: Trick.TrickAttribute.TrickAttributeType) -> [Trick.TrickAttribute] {
+        trickAttributesByEnabledState.compactMap { (trickAttribute, isEnabled) in
+            guard trickAttribute.type == withType, isEnabled else {
+                return nil
+            }
+            
+            return trickAttribute
+        }
+    }
+    
     var enabledSoulPlateTrickSpins: [Trick.Spin] {
         enabledTrickSpins.filter({ $0.isSoulPlateTrick })
     }
@@ -138,30 +152,30 @@ class TrickContext {
     }
     
     // MARK: - Methods
+    
+    func canDisableTrickAttribute(_ trickAttribute: Trick.TrickAttribute) -> Bool {
+        guard trickAttribute.type != .trickType else {
+            return true
+        }
+        
+        let enabledAttributesWithMatchingType = enabledTrickAttributes(withType: trickAttribute.type)
+            .filter { $0.isSoulPlateAttribute == trickAttribute.isSoulPlateAttribute }
+        return enabledAttributesWithMatchingType.count > 1
+    }
         
     func updateEnabledState(forTrickAttribute trickAttribute: Trick.TrickAttribute, isEnabled: Bool) {
         switch trickAttribute {
         case .trickType(let trickType):
             updateEnabledStateForAllTrickAttributesForTrickType(trickType, isEnabled: isEnabled)
-            switch trickType {
-            case .soulPlate:
-                if trickAttributesByEnabledState[.trickType(trickType: .hBlock)] == false && !isEnabled {
-                    updateEnabledStateForAllTrickAttributesForTrickType(.hBlock, isEnabled: true)
-                }
-                return
-            case .hBlock:
-                if trickAttributesByEnabledState[.trickType(trickType: .soulPlate)] == false && !isEnabled {
-                    updateEnabledStateForAllTrickAttributesForTrickType(.soulPlate, isEnabled: true)
-                }
-                return
+            let otherTrickType: Trick.TrickType = trickType == .soulPlate ? .hBlock : .soulPlate
+            if !isTrickTypeEnabled(otherTrickType) && !isEnabled {
+                updateEnabledStateForAllTrickAttributesForTrickType(otherTrickType, isEnabled: true)
             }
         case .trickBase, .side, .spin:
-            trickAttributesByEnabledState[trickAttribute] = isEnabled
-            if trickAttribute.isSoulPlateAttribute, enabledSoulPlateBases.count == 0 {
-                trickAttributesByEnabledState[trickAttribute] = true
-            } else if !trickAttribute.isSoulPlateAttribute, enabledHBlockBases.count == 0 {
-                trickAttributesByEnabledState[trickAttribute] = true
+            guard !(!canDisableTrickAttribute(trickAttribute) && !isEnabled) else {
+                return
             }
+            trickAttributesByEnabledState[trickAttribute] = isEnabled
         }
     }
     

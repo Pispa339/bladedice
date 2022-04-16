@@ -20,7 +20,7 @@ final class SettingsViewController: UIViewController {
     // MARK: - UIViews
     
     private lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .grouped)
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(SettingsTableViewCell.self, forCellReuseIdentifier: SettingsTableViewCell.reuseIdentifier)
         tableView.delegate = self
@@ -40,29 +40,7 @@ final class SettingsViewController: UIViewController {
                 }
                 
                 let isOn = (self.trickContext.trickAttributesByEnabledState[trickAttribute] ?? true)
-                let isEnabled: Bool
-                switch trickAttribute {
-                case .trickType:
-                    isEnabled = true
-                case .trickBase(let trickBase):
-                    if trickBase.isSoulPlateTrick {
-                        isEnabled = self.trickContext.isSoulPlateTricksEnabled
-                    } else {
-                        isEnabled = self.trickContext.isHBlockTricksEnabled
-                    }
-                case .spin(let spin):
-                    if spin.isSoulPlateTrick {
-                        isEnabled = self.trickContext.isSoulPlateTricksEnabled
-                    } else {
-                        isEnabled = self.trickContext.isHBlockTricksEnabled
-                    }
-                case .side(let side):
-                    if side.isSoulPlateTrick {
-                        isEnabled = self.trickContext.isSoulPlateTricksEnabled
-                    } else {
-                        isEnabled = self.trickContext.isHBlockTricksEnabled
-                    }
-                }
+                let isEnabled = self.trickContext.canDisableTrickAttribute(trickAttribute) || !isOn
                 let cellViewModel = SettingsTableViewCell.ViewModel(trickAttribute: trickAttribute, isOn: isOn, isEnabled: isEnabled)
                 cell.viewModel = cellViewModel
                 cell.delegate = self
